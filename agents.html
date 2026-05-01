@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Choose Agent</title>
+  <link rel="stylesheet" href="agents.css" />
+</head>
+<body>
+
+<main class="page">
+  <header>
+    <p>CHOOSE YOUR</p>
+    <h1>BIRTHDAY AGENT</h1>
+    <span>✦ Pick your main agent ✦</span>
+  </header>
+
+  <section class="layout">
+
+    <button class="arrow left" onclick="prevAgent()">‹</button>
+
+    <div class="cards" id="cards"></div>
+
+    <button class="arrow right" onclick="nextAgent()">›</button>
+
+    <aside class="info-panel">
+      <h2 id="agentName">REYNA</h2>
+
+      <div class="divider"></div>
+
+      <div class="info-row">
+        <span class="icon">⌖</span>
+        <div>
+          <h3>Role</h3>
+          <p id="agentRole">Duelist</p>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <span class="icon">☄</span>
+        <div>
+          <h3>Style</h3>
+          <p id="agentStyle">Agresivní, sebevědomá</p>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <span class="icon">▥</span>
+        <div>
+          <h3>Difficulty</h3>
+          <p id="agentDifficulty">✦ ✦ ✦ ✦ ◇</p>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <span class="icon">✦</span>
+        <div>
+          <h3>Speciality</h3>
+          <p id="agentSpecial">Přebírá kontrolu. Září v každé situaci.</p>
+        </div>
+      </div>
+
+      <blockquote id="agentQuote">
+        Já nehledám problémy.<br>
+        Problémy hledají mě.
+      </blockquote>
+    </aside>
+
+  </section>
+
+  <button class="confirm" onclick="confirmAgent()">
+    🎂 CONFIRM SELECTION 🎂
+  </button>
+
+  <p class="footer"> Po výběru tě čeká malé překvapení... </p>
+
+  <div class="balloons"></div>
+  <div class="gifts"></div>
+</main>
+
+<script>
+const agents = [
+  {
+    name: "MIKS",
+    card: "♦",
+    img: "img/Miks.png",
+    text: "Set the tempo. Break the rhythm.",
+    role: "Controller",
+    style: "Flashy, unpredictable",
+    difficulty: "✦ ✦ ✦ ◇ ◇",
+    special: "Controls space with rhythm, pressure and pure confidence.",
+    quote: "Set the tempo.<br>They follow my beat."
+  },
+  {
+    name: "CLOVE",
+    card: "♣",
+    img: "img/Clove.png",
+    text: "Back again. Still causing trouble.",
+    role: "Controller",
+    style: "Bold, playful",
+    difficulty: "✦ ✦ ✦ ✦ ◇",
+    special: "Comes back swinging even when the round looks lost.",
+    quote: "Death is not the end.<br>It’s just a wee reset."
+  },
+  {
+    name: "SAGE",
+    card: "♠",
+    img: "img/Sage.png",
+    text: "Calm mind. Stronger team.",
+    role: "Sentinel",
+    style: "Calm, protective",
+    difficulty: "✦ ✦ ◇ ◇ ◇",
+    special: "Keeps the team alive when everything starts falling apart.",
+    quote: "I am both shield and sword.<br>Stay behind me."
+  },
+  {
+    name: "REYNA",
+    card: "♥",
+    img: "img/Reyna.png",
+    text: "Main character danger. Don’t challenge.",
+    role: "Duelist",
+    style: "Aggressive, fearless",
+    difficulty: "✦ ✦ ✦ ✦ ◇",
+    special: "Takes over fights and feeds on every mistake.",
+    quote: "They have no idea<br>how heartless I am."
+  }
+];
+
+let current = 3;
+const cardsEl = document.getElementById("cards");
+
+function initCards() {
+  cardsEl.innerHTML = "";
+
+  agents.forEach((agent, index) => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="corner top">${agent.card}</div>
+      <h3>${agent.name}</h3>
+      <div class="portrait">
+        <img src="${agent.img}" alt="${agent.name}">
+      </div>
+      <p>${agent.text}</p>
+      <div class="corner bottom">${agent.card}</div>
+    `;
+
+    card.onclick = () => {
+      current = index;
+      update();
+    };
+
+    cardsEl.appendChild(card);
+  });
+}
+
+function updateCards() {
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach((card, index) => {
+    let offset = index - current;
+
+    card.classList.toggle("active", index === current);
+
+    card.style.transform = `
+      translateX(${offset * 165}px)
+      translateY(${Math.abs(offset) * 25}px)
+      rotate(${offset * -5}deg)
+      scale(${index === current ? 1.08 : 0.88})
+    `;
+
+    card.style.zIndex = 10 - Math.abs(offset);
+    card.style.opacity = Math.abs(offset) > 3 ? 0 : 1;
+  });
+}
+
+function renderInfo() {
+  const agent = agents[current];
+
+  document.getElementById("agentName").innerHTML = agent.name;
+  document.getElementById("agentRole").innerHTML = agent.role;
+  document.getElementById("agentStyle").innerHTML = agent.style;
+  document.getElementById("agentDifficulty").innerHTML = agent.difficulty;
+  document.getElementById("agentSpecial").innerHTML = agent.special;
+  document.getElementById("agentQuote").innerHTML = agent.quote;
+}
+
+function update() {
+  updateCards();
+  renderInfo();
+}
+
+function nextAgent() {
+  current = (current + 1) % agents.length;
+  update();
+}
+
+function prevAgent() {
+  current = (current - 1 + agents.length) % agents.length;
+  update();
+}
+
+function confirmAgent() {
+  localStorage.setItem("selectedAgent", agents[current].name);
+  window.location.href = "reward.html";
+}
+
+initCards();
+update();
+</script>
+
+</body>
+</html>
